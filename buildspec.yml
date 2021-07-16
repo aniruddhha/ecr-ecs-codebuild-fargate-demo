@@ -24,7 +24,7 @@ phases:
       - echo Pushing the Docker Image
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-repo:latest
       - echo writing definations file
-      - printf '[{"name":"intcdeij027-container","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-repo:latest > taskdefination.json
+      - printf '[{"name":"my-container","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-repo:latest > taskdefination.json
 artifacts:
   files:
     - taskdefination.json
