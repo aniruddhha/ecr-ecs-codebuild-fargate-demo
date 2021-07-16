@@ -1,0 +1,30 @@
+version: 0.2
+run-as: root
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+  pre_build:
+    commands:
+      - echo Nothing to do in the pre_build phase...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+  build:
+    commands:
+      - echo Build started on `date`
+      - mvn compile
+      - mvn package
+      - echo building docker image ....
+      - echo Account Id - $AWS_ACCOUNT_ID, Region - $AWS_REGION
+      - docker build -t my-repo .
+      - docker tag my-repo $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-repo:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker Image
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-repo:latest
+      - echo writing definations file
+      - printf '[{"name":"intcdeij027-container","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-repo:latest > taskdefination.json
+artifacts:
+  files:
+    - taskdefination.json
